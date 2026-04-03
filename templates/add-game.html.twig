@@ -1,0 +1,38 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Add New Game{% endblock %}
+
+{% block content %}
+    <h2>Add New Game to Collection</h2>
+    
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+    
+    <form method="POST" action="process-add.php">
+        <div>
+            <label>Game Title:</label><br>
+            <input type="text" name="game_title" required maxlength="200">
+        </div>
+        
+        <div>
+            <label>Description:</label><br>
+            <textarea name="game_description" rows="5" required></textarea>
+        </div>
+        
+        <div>
+            <label>Release Year:</label><br>
+            <input type="number" name="release_year" min="1970" max="2025" required>
+        </div>
+        
+        <div>
+            <label>Rating (1-5):</label><br>
+            <input type="number" name="game_rating" step="0.1" min="1" max="5" required>
+        </div>
+        
+        <div>
+            <input type="submit" value="Add Game">
+            <a href="view-games.php">Cancel</a>
+        </div>
+    </form>
+{% endblock %}

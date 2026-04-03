@@ -1,0 +1,50 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Advanced Search{% endblock %}
+
+{% block content %}
+    <h2>Advanced Game Search</h2>
+    
+    <form method="GET" action="search-results.php">
+        <div>
+            <label>Title Contains:</label><br>
+            <input type="text" name="title_keyword">
+        </div>
+        
+        <div>
+            <label>Minimum Rating:</label><br>
+            <select name="min_rating">
+                <option value="">Any</option>
+                {% for i in 1..5 %}
+                    <option value="{{ i }}">{{ i }}+</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div>
+            <label>Maximum Rating:</label><br>
+            <select name="max_rating">
+                <option value="">Any</option>
+                {% for i in 1..5 %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div>
+            <label>Release Year:</label><br>
+            <input type="number" name="year" min="1970" max="2025">
+        </div>
+        
+        <div>
+            <input type="submit" value="Search Games">
+        </div>
+    </form>
+    
+    <h3>Quick Searches:</h3>
+    <ul>
+        <li><a href="search-results.php?min_rating=4">Highly Rated Games (4+)</a></li>
+        <li><a href="search-results.php?year=2023">2023 Releases</a></li>
+        <li><a href="search-results.php?min_rating=3&max_rating=4">Good Games (3-4)</a></li>
+    </ul>
+{% endblock %}

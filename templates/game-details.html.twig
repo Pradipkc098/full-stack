@@ -1,0 +1,24 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ game.game_title }} - Details{% endblock %}
+
+{% block content %}
+    <h2>{{ game.game_title }}</h2>
+    
+    <p><strong>Release Year:</strong> {{ game.release_year }}</p>
+    
+    <p><strong>Rating:</strong> {{ game.score }}/5</p>
+    
+    <p><strong>Description:</strong><br>
+    {{ game.game_summary|nl2br }}
+    </p>
+    
+    <p><strong>Added to Collection:</strong> {{ game.date_added|date('F j, Y') }}</p>
+    
+    <hr>
+    
+    <p>
+        <a href="modify-game.php?id={{ game.game_id }}">Edit This Game</a> | 
+        <a href="view-games.php">Back to Collection</a>
+    </p>
+{% endblock %}

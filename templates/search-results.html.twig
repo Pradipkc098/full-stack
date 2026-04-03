@@ -1,0 +1,51 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+    <h2>Search Results</h2>
+    
+    <p>Search Criteria Applied:</p>
+    <ul>
+        {% if criteria.title_keyword %}
+            <li>Title contains: {{ criteria.title_keyword }}</li>
+        {% endif %}
+        {% if criteria.desc_keyword %}
+            <li>Description contains: {{ criteria.desc_keyword }}</li>
+        {% endif %}
+        {% if criteria.min_rating %}
+            <li>Minimum rating: {{ criteria.min_rating }}</li>
+        {% endif %}
+        {% if criteria.max_rating %}
+            <li>Maximum rating: {{ criteria.max_rating }}</li>
+        {% endif %}
+        {% if criteria.year %}
+            <li>Release year: {{ criteria.year }}</li>
+        {% endif %}
+    </ul>
+    
+    <h3>Found Games: {{ results|length }}</h3>
+    
+    {% if results %}
+        <table border="1">
+            <tr>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Rating</th>
+                <th>View</th>
+            </tr>
+            {% for game in results %}
+                <tr>
+                    <td>{{ game.game_title }}</td>
+                    <td>{{ game.release_year }}</td>
+                    <td>{{ game.score }}/5</td>
+                    <td><a href="game-info.php?id={{ game.game_id }}">Details</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No games match your search criteria.</p>
+    {% endif %}
+    
+    <p><a href="advanced-search.php">New Search</a> | <a href="view-games.php">View All Games</a></p>
+{% endblock %}

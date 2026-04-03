@@ -1,0 +1,61 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Game Collection{% endblock %}
+
+{% block content %}
+    <h2>Video Game Collection</h2>
+    
+    <p>
+        Sort by: 
+        <a href="?sort=name">Title</a> | 
+        <a href="?sort=year">Year</a> | 
+        <a href="?sort=rating">Rating</a> | 
+        <a href="?sort=id">Newest</a>
+    </p>
+    
+    {% if success_message %}
+        <p style="color: green;">{{ success_message }}</p>
+    {% endif %}
+    
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+    
+    {% if games and games|length > 0 %}
+        <table border="1">
+            <tr>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Rating</th>
+                <th>Actions</th>
+            </tr>
+            {% for game in games %}
+                <tr>
+                    <td>{{ game.game_title ?: game.game_name ?: game.title }}</td>
+                    <td>{{ game.release_year ?: 'N/A' }}</td>
+                    <td>
+                        {% if game.score %}
+                            {{ game.score }}/5
+                        {% elseif game.rating %}
+                            {{ game.rating }}/5
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="game-info.php?id={{ game.game_id ?: game.id }}">View</a> | 
+                        <a href="modify-game.php?id={{ game.game_id ?: game.id }}">Edit</a> | 
+                        <a href="remove-game.php?id={{ game.game_id ?: game.id }}" 
+                           onclick="return confirm('Delete this game?')">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No games in collection. <a href="add-game.php">Add your first game!</a></p>
+    {% endif %}
+    
+    <p>Total: {{ total_count }} games</p>
+    
+    <p><a href="add-game.php">Add New Game</a></p>
+{% endblock %}

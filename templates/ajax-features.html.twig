@@ -1,0 +1,306 @@
+{% extends "base.html.twig" %}
+
+{% block title %}AJAX Features{% endblock %}
+
+{% block content %}
+    <h1>AJAX Interactive Features</h1>
+    
+    <div class="ajax-section">
+        <h2>Live Game Search</h2>
+        <div>
+            <input type="text" id="liveSearch" placeholder="Type game title...">
+            <div id="searchResults" class="ajax-results"></div>
+        </div>
+    </div>
+    
+    <div class="ajax-section">
+        <h2>Quick Game Lookup</h2>
+        <div id="gameLookup">
+            <input type="text" id="gameIdInput" placeholder="Enter Game ID">
+            <button onclick="fetchGameDetails()" class="ajax-button">Get Game Info</button>
+            <div id="gameDetails" class="ajax-results"></div>
+        </div>
+    </div>
+    
+    <div class="ajax-section">
+        <h2>Rating Statistics</h2>
+        <button onclick="loadRatingStats()" class="ajax-button">Show Rating Distribution</button>
+        <div id="ratingStats" class="ajax-results"></div>
+    </div>
+    
+    <hr>
+    <p><a href="dashboard.php" class="back-link">Back to Dashboard</a></p>
+    
+    <script>
+    document.getElementById('liveSearch').addEventListener('input', function() {
+        const searchTerm = this.value;
+        if (searchTerm.length < 2) {
+            document.getElementById('searchResults').innerHTML = '';
+            return;
+        }
+        
+        fetch('ajax-live-search.php?term=' + encodeURIComponent(searchTerm))
+            .then(response => response.json())
+            .then(data => {
+                let html = '';
+                if (data.length > 0) {
+                    html = '<ul class="search-results-list">';
+                    data.forEach(game => {
+                        html += '<li><a href="game-info.php?id=' + game.game_id + '" class="game-link">' + 
+                                game.game_title + ' (' + game.release_year + ')</a></li>';
+                    });
+                    html += '</ul>';
+                } else {
+                    html = '<p class="no-results">No matching games found</p>';
+                }
+                document.getElementById('searchResults').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('searchResults').innerHTML = '<p class="error">Search failed</p>';
+            });
+    });
+    
+    function fetchGameDetails() {
+        const gameId = document.getElementById('gameIdInput').value;
+        if (!gameId) {
+            document.getElementById('gameDetails').innerHTML = '<p class="error">Please enter a Game ID</p>';
+            return;
+        }
+        
+        document.getElementById('gameDetails').innerHTML = '<p>Loading...</p>';
+        
+        fetch('ajax-game-details.php?id=' + gameId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('gameDetails').innerHTML = '<p class="error">' + data.error + '</p>';
+                } else {
+                    let html = '<div class="game-details-card">';
+                    html += '<h3>' + data.game_title + '</h3>';
+                    html += '<p><strong>Year:</strong> ' + data.release_year + '</p>';
+                    html += '<p><strong>Rating:</strong> ' + data.score + '/5</p>';
+                    html += '<p><strong>Description:</strong> ' + data.game_summary.substring(0, 150) + '...</p>';
+                    html += '<p><a href="game-info.php?id=' + gameId + '" class="view-more">View Full Details</a></p>';
+                    html += '</div>';
+                    document.getElementById('gameDetails').innerHTML = html;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('gameDetails').innerHTML = '<p class="error">Failed to load game details</p>';
+            });
+    }
+    
+    function loadRatingStats() {
+        document.getElementById('ratingStats').innerHTML = '<p>Loading statistics...</p>';
+        
+        fetch('ajax-rating-stats.php')
+            .then(response => response.json())
+            .then(data => {
+                let html = '';
+                if (data.length > 0) {
+                    html = '<div class="stats-container">';
+                    html += '<table class="stats-table">';
+                    html += '<tr><th>Rating Range</th><th>Number of Games</th></tr>';
+                    data.forEach(item => {
+                        html += '<tr>';
+                        html += '<td>' + item.rating + '</td>';
+                        html += '<td>' + item.count + '</td>';
+                        html += '</tr>';
+                    });
+                    html += '</table>';
+                    
+                    // Add a simple bar chart
+                    html += '<div class="chart-container">';
+                    data.forEach(item => {
+                        const width = (item.count / Math.max(...data.map(d => d.count))) * 100;
+                        html += '<div class="chart-row">';
+                        html += '<span class="chart-label">' + item.rating + '</span>';
+                        html += '<div class="chart-bar" style="width: ' + width + '%;"></div>';
+                        html += '<span class="chart-value">' + item.count + '</span>';
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                    html += '</div>';
+                } else {
+                    html = '<p class="no-results">No rating data available</p>';
+                }
+                document.getElementById('ratingStats').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('ratingStats').innerHTML = '<p class="error">Failed to load statistics</p>';
+            });
+    }
+    </script>
+    
+    <style>
+    .ajax-section {
+        background: rgba(30, 60, 114, 0.3);
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        border: 1px solid #00ffcc;
+    }
+    
+    .ajax-results {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 6px;
+        margin: 10px 0;
+        min-height: 50px;
+    }
+    
+    #liveSearch {
+        width: 300px;
+        padding: 10px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid #00ffcc;
+        border-radius: 4px;
+        color: white;
+    }
+    
+    .ajax-button {
+        background: #00cc99;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    .ajax-button:hover {
+        background: #00ffcc;
+    }
+    
+    #gameIdInput {
+        width: 200px;
+        padding: 10px;
+        margin-right: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid #00ffcc;
+        border-radius: 4px;
+        color: white;
+    }
+    
+    .search-results-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .search-results-list li {
+        padding: 8px;
+        border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+    }
+    
+    .search-results-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .game-link {
+        color: #66ccff;
+        text-decoration: none;
+    }
+    
+    .game-link:hover {
+        color: #00ffcc;
+        text-decoration: underline;
+    }
+    
+    .game-details-card {
+        background: rgba(30, 60, 114, 0.5);
+        padding: 15px;
+        border-radius: 6px;
+        border-left: 4px solid #00ffcc;
+    }
+    
+    .view-more {
+        color: #00ffcc;
+        font-weight: bold;
+    }
+    
+    .no-results {
+        color: #8888cc;
+        font-style: italic;
+    }
+    
+    .error {
+        color: #ff6666;
+    }
+    
+    .stats-table {
+        width: 100%;
+        margin-bottom: 20px;
+        background: rgba(30, 60, 114, 0.5);
+    }
+    
+    .stats-table th {
+        background: #1e3c72;
+        color: white;
+        padding: 10px;
+    }
+    
+    .stats-table td {
+        padding: 8px;
+        border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+    }
+    
+    .chart-container {
+        margin-top: 20px;
+    }
+    
+    .chart-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    .chart-label {
+        width: 100px;
+        color: #ccffcc;
+    }
+    
+    .chart-bar {
+        height: 20px;
+        background: linear-gradient(90deg, #00cc99, #00ffcc);
+        margin: 0 10px;
+        border-radius: 3px;
+        transition: width 1s ease-in-out;
+    }
+    
+    .chart-value {
+        color: white;
+        font-weight: bold;
+    }
+    
+    .back-link {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #2a5298;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background 0.3s;
+    }
+    
+    .back-link:hover {
+        background: #1e3c72;
+        text-decoration: none;
+    }
+    
+    @media (max-width: 768px) {
+        #liveSearch, #gameIdInput {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .ajax-button {
+            width: 100%;
+        }
+    }
+    </style>
+{% endblock %}

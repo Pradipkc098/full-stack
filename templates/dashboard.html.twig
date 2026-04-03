@@ -1,0 +1,45 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h2>Game Collection Dashboard</h2>
+    
+    <p>Welcome to your game management system!</p>
+    
+    <h3>Quick Actions</h3>
+    <ul>
+        <li><a href="view-games.php">Browse All Games</a></li>
+        <li><a href="add-game.php">Add New Game</a></li>
+        <li><a href="advanced-search.php">Advanced Search</a></li>
+        <li><a href="ajax-features.php">AJAX Features</a></li>
+    </ul>
+    
+    <h3>Collection Statistics</h3>
+    <ul>
+        <li>Total Games: {{ total_games }}</li>
+        {% if recent_games is not same as('N/A') %}
+            <li>Recent Additions: {{ recent_games }}</li>
+        {% endif %}
+        <li>Average Rating: {{ avg_rating }}/5</li>
+    </ul>
+    
+    <h3>Recently Added</h3>
+    {% if recent_list and recent_list|length > 0 %}
+        <ul>
+        {% for game in recent_list %}
+            <li>
+                {{ game.game_title ?: game.game_name }} 
+                {% if game.release_year %}
+                    ({{ game.release_year }})
+                {% endif %}
+                {% if game.date_added %}
+                    - Added: {{ game.date_added|date('M d, Y') }}
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No recent games or unable to load recent list</p>
+    {% endif %}
+{% endblock %}

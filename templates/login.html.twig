@@ -1,0 +1,37 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Login - Game Collection{% endblock %}
+
+{% block content %}
+    <h2>Secure Login Portal</h2>
+    
+    {% if error_code == 1 %}
+        <p style="color: red;">Invalid credentials or security check failed</p>
+    {% endif %}
+    
+    {% if error_code == 2 %}
+        <p style="color: red;">Security verification failed</p>
+    {% endif %}
+    
+    <form method="POST" action="verify-login.php">
+        <div>
+            <label for="user_identifier">Username:</label><br>
+            <input type="text" id="user_identifier" name="user_identifier" required>
+        </div>
+        
+        <div>
+            <label for="user_password">Password:</label><br>
+            <input type="password" id="user_password" name="user_password" required>
+        </div>
+        
+        <div>
+            <label>Security Question:</label><br>
+            <p>What is 5 + 2?</p>
+            <input type="number" name="security_answer" required>
+        </div>
+        
+        <div>
+            <input type="submit" value="Login">
+        </div>
+    </form>
+{% endblock %}

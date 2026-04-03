@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Game Collection{% endblock %}</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Video Game Collection System</h1>
+        {% if session.authenticated %}
+            <p>Welcome, {{ session.user_name }} | <a href="logout.php">Logout</a></p>
+        {% endif %}
+    </header>
+    
+    <nav>
+        {% if session.authenticated %}
+            <a href="dashboard.php">Dashboard</a> |
+            <a href="view-games.php">View Games</a> |
+            <a href="add-game.php">Add Game</a> |
+            <a href="advanced-search.php">Search</a> |
+            <a href="ajax-features.php">AJAX Features</a>
+        {% endif %}
+    </nav>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <hr>
+        <p>Student: Pradip KC | ID: 2449500</p>
+    </footer>
+</body>
+</html>
